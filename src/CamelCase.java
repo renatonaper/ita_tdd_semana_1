@@ -6,19 +6,20 @@ import java.util.regex.Pattern;
 public class CamelCase {
 	
 
+	private static String REGEX_NUMERO = "((.*)([0-9]+)(.*))";
+	private static String REGEX_CORTAR = "(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])";
+	
 	public CamelCase() {
 	}
 
 	public static List<String> converterCamelCase(String original) {
 		
-		if (original == null || original.length() == 0 ) {
+		if (!validacaoNuloOuVazio(original)) {
 			throw new CamelCaseException("Não pode ser vazio");
-			
 		}
 		
-		if (Character.isDigit(original.charAt(0))) {
-			throw new CamelCaseException("Não deve começar com números ");
-			
+		if (!naoPodeComecarComNumero(original)) {
+			throw new CamelCaseException("Não deve começar com números ");	
 		}
 		
 		if (contemTextoEspecial(original)) {
@@ -26,15 +27,8 @@ public class CamelCase {
 			
 		}
 		
-		
-		if (original.matches("((.*)([0-9]+)(.*))")){
-			return contemNumero(original);
-			
-		}
-		else {
-			String[] cortarTexto = original.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])");
-			return retornarTextos(cortarTexto);
-		}
+		return processaTexto(original);
+	
 	}
 	
 	
@@ -55,9 +49,6 @@ public class CamelCase {
 	
 
 	public static List<String> retornarTextos(String[] cortarTexto){
-		
-	
-
 		List<String> listaTextos = new ArrayList<String>();
 		for (int i = 0; i < cortarTexto.length; i++)
 			if (!cortarTexto[i].isEmpty())
@@ -80,7 +71,40 @@ public class CamelCase {
 		}
 		return charEspecial;
 	}
+	
+	
+	public static boolean validacaoNuloOuVazio(String original) {
+		boolean status = true;
+		if (original == null || original.length() == 0 ) {
+			status= false;
+		}
+		
+		return status;
+	}
+	
+	public static boolean naoPodeComecarComNumero(String original) {
+		boolean status = true;
+		if (Character.isDigit(original.charAt(0))) {
+			status = false;
+		}
+		
+		return status;
+	}
  	
+	
+	public static List<String> processaTexto(String original) {
+		
+		if (original.matches(REGEX_NUMERO)){
+			return contemNumero(original);
+			
+		}
+		else {
+			String[] cortarTexto = original.split(REGEX_CORTAR);
+			return retornarTextos(cortarTexto);
+		}
+		
+	}
+	
 	
 	public static void main(String[] args) 
 	{
